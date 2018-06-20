@@ -1,6 +1,7 @@
 from clint.textui import colored, puts
 import requests
 import sys
+import json
 
 COIN_DICTIONARY = {
     "BTC": 1,
@@ -37,10 +38,18 @@ if len(args) >= 2:
         elif arg == "--remove" or arg == "-r":
             removeCoin = True
     #         TODO: Remove Coin
+        elif arg == "--coins":
+            print("Coins!")
+    #         TODO: Print coins
+        elif arg == "--saved":
+            print("Saved!")
+    #         TODO: Saved coins
+
     price = requests.get(url + str(COIN_DICTIONARY[coin]))
     if not price.ok:
         print("Error in API check, please try again later.")
         exit(1)
+
     response = price.json()
 
     coinText = colored.yellow("Coin:\t" + coin)
@@ -79,3 +88,5 @@ if len(args) >= 2:
         perChange1h +
         perChange24h +
         perChange7d)
+
+    json.dumps(COIN_DICTIONARY)

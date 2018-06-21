@@ -3,8 +3,6 @@ import requests
 import sys
 import pickle
 
-# TODO: Load/Save Coin_Dictionary and savedCoins
-
 COIN_DICTIONARY = {
     "BTC": 1,
     "LTC": 2

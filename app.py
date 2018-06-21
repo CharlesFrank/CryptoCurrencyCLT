@@ -1,12 +1,16 @@
 from clint.textui import colored, puts
 import requests
 import sys
-import json
+import pickle
+
+# TODO: Load/Save Coin_Dictionary and savedCoins
 
 COIN_DICTIONARY = {
     "BTC": 1,
     "LTC": 2
 }
+
+savedCoins = []
 
 args = sys.argv
 saveCoin = False
@@ -15,44 +19,16 @@ coin = ""
 
 url = "https://api.coinmarketcap.com/v2/ticker/"
 
-if len(args) == 2:
-    if args[1] == '--help' or args[1] == '-h':
-        print("Help!")
-#         TODO: Help Message
 
-if len(args) > 3:
-    print("Too many arguments! Try --help to learn more.")
-    exit(0)
-
-if len(args) >= 2:
-    coin = args[1]
-    coin = str.upper(coin)
-    if coin not in COIN_DICTIONARY:
-        print(coin + " is not supported. Please try another coin or use --coins for available coins.")
-        exit(0)
-    if len(args) == 3:
-        arg = args[2]
-        if arg == "--save" or arg == "-s":
-            saveCoin = True
-        #     TODO: Save Coin
-        elif arg == "--remove" or arg == "-r":
-            removeCoin = True
-    #         TODO: Remove Coin
-        elif arg == "--coins":
-            print("Coins!")
-    #         TODO: Print coins
-        elif arg == "--saved":
-            print("Saved!")
-    #         TODO: Saved coins
-
-    price = requests.get(url + str(COIN_DICTIONARY[coin]))
+def check_coin(search_coin):
+    price = requests.get(url + str(COIN_DICTIONARY[search_coin]))
     if not price.ok:
         print("Error in API check, please try again later.")
         exit(1)
 
     response = price.json()
 
-    coinText = colored.yellow("Coin:\t" + coin)
+    coinText = colored.yellow("Coin:\t" + search_coin)
     price = colored.yellow("\nPrice:\t$" + str(response['data']['quotes']['USD']['price']))
     v24 = colored.yellow("\n24h Volume:\t$" + str(response['data']['quotes']['USD']['volume_24h']))
     marketCap = colored.yellow("\nMarket Cap:\t$" + str(response['data']['quotes']['USD']['market_cap']))
@@ -81,12 +57,101 @@ if len(args) >= 2:
     else:
         perChange7d = "\nPercent Change - 74:\t" + perChange7d + "%"
 
-    puts(coinText+
-        price +
-        v24 +
-        marketCap +
-        perChange1h +
-        perChange24h +
-        perChange7d)
+    puts(coinText +
+         price +
+         v24 +
+         marketCap +
+         perChange1h +
+         perChange24h +
+         perChange7d)
 
-    json.dumps(COIN_DICTIONARY)
+
+def build_coin_dict():
+    cd = {}
+    puts(colored.blue("Building Coin Dict..."))
+    response = requests.get("https://api.coinmarketcap.com/v2/listings/")
+    listings = response.json()
+    for listing in listings['data']:
+        cd[listing['symbol']] = listing['id']
+    puts(colored.blue("Done."))
+    return cd
+
+
+def save():
+    puts(colored.blue("Saving!"))
+    pickle.dump(COIN_DICTIONARY, open("CC_Coin_Config.txt", "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+    pickle.dump(savedCoins, open("User_Coins.txt", "wb"), protocol=pickle.HIGHEST_PROTOCOL)
+
+
+def load():
+    puts(colored.blue("Loading!"))
+    try:
+        cd = pickle.load(open("CC_Coin_Config.txt", "rb"))
+    except:
+        cd = build_coin_dict()
+
+    try:
+        sc = pickle.load(open("User_Coins.txt", "rb"))
+    except:
+        sc = []
+
+    return cd, sc
+
+
+COIN_DICTIONARY, savedCoins = load()
+
+if len(args) == 1:
+    curr = len(savedCoins)
+    for coin in savedCoins:
+        curr = curr - 1
+        check_coin(coin)
+        if curr > 0:
+            print("========================")
+
+if len(args) == 2:
+    if args[1] == '--help' or args[1] == '-h':
+        helpMessage = "To find the price of a coin, type the coins abbreviation alongside the call to this app. \n" \
+                      "To see which coins you saved, use the flag --saved.\n" \
+                      "To see a list of available coins, use the flag --coins.\n" \
+                      "To save a coin, add --save after the coin symbol.\n" \
+                      "To remove a coin, use --remove after the coin symbol.\n" \
+                      "To print out the prices of your saved coins, just call this app with no additional argument.\n" \
+                      "To update the coin dictionary, use --update.\n"
+        puts(colored.yellow(helpMessage))
+        exit(0)
+    elif args[1] == "--coins":
+        puts(colored.yellow("The available coins are as follows:"))
+        for key, value in sorted(COIN_DICTIONARY.items()):
+            puts(colored.yellow(key))
+        exit(0)
+    elif args[1] == "--saved":
+        for coin in savedCoins:
+            puts(colored.yellow(coin))
+        exit(0)
+    elif args[1] == '--update':
+        build_coin_dict()
+        save()
+        exit(0)
+
+if len(args) > 3:
+    print("Too many arguments! Try --help to learn more.")
+    exit(0)
+
+if len(args) >= 2:
+    coin = args[1]
+    coin = str.upper(coin)
+    if coin not in COIN_DICTIONARY:
+        puts(colored.red(coin + " is not supported. Please try another coin or use --coins for available coins."))
+        exit(0)
+    if len(args) == 3:
+        arg = args[2]
+        if arg == "--save" or arg == "-s":
+            if coin not in savedCoins:
+                savedCoins.append(coin)
+        elif arg == "--remove" or arg == "-r":
+            savedCoins.remove(coin)
+
+    check_coin(coin)
+
+    save()
+    exit(0)

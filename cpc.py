@@ -49,11 +49,11 @@ def check_coin(search_coin):
         perChange24h = "\nPercent Change - 24h:\t" + perChange24h + "%"
 
     if float(perChange7d) < 0:
-        perChange7d = colored.red("\nPercent Change - 74:\t" + perChange7d + "%")
+        perChange7d = colored.red("\nPercent Change - 7d:\t" + perChange7d + "%")
     elif float(perChange7d) > 0:
-        perChange7d = colored.green("\nPercent Change - 74:\t" + perChange7d + "%")
+        perChange7d = colored.green("\nPercent Change - 7d:\t" + perChange7d + "%")
     else:
-        perChange7d = "\nPercent Change - 74:\t" + perChange7d + "%"
+        perChange7d = "\nPercent Change - 7d:\t" + perChange7d + "%"
 
     puts(coinText +
          price +

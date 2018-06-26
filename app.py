@@ -108,7 +108,7 @@ if len(args) == 1:
 
 if len(args) == 2:
     if args[1] == '--help' or args[1] == '-h':
-        helpMessage = "To find the price of a coin, type the coins abbreviation alongside the call to this app. \n" \
+        helpMessage = "To find the price of a coin, type the coins symbol alongside the call to this app. \n" \
                       "To see which coins you saved, use the flag --saved.\n" \
                       "To see a list of available coins, use the flag --coins.\n" \
                       "To save a coin, add --save after the coin symbol.\n" \

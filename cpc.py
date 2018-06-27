@@ -139,7 +139,8 @@ if len(args) >= 2:
     coin = args[1]
     coin = str.upper(coin)
     if coin not in COIN_DICTIONARY:
-        puts(colored.red(coin + " is not supported. Please try another coin or use --coins for available coins."))
+        puts(colored.red(coin + " is not supported. Please try another coin or use --coins for a list of"
+                                " available coins."))
         exit(0)
     if len(args) == 3:
         arg = args[2]

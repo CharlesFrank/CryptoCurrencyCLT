@@ -1,5 +1,5 @@
 # CryptoCurrencyCLT - CPC
-# Author: Charles Frank
+###### Author: Charles Frank
 
 ### Installing: 
 1. Download the appropriate version from /dist/

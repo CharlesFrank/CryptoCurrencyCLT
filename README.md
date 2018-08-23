@@ -9,3 +9,9 @@
 ### Building From Repo:
 ##### Unix:
 1. In terminal from project root: $ python setup.py sdist
+
+
+### Use:
+In terminal from /cpc-[verison number]/: $ python cpc.py -h
+
+Coins are available from the api at coinmarketcap.com
